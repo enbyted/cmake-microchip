@@ -31,30 +31,48 @@ endif()
 set(CMAKE_FIND_ROOT_PATH "${MICROCHIP_XC8_PATH}")
 
 # skip compiler search and just use XC8
-find_program(CMAKE_C_COMPILER "xc8"
+find_program(CMAKE_C_COMPILER "xc8-cc"
     PATHS "${MICROCHIP_XC8_PATH}"
     PATH_SUFFIXES "bin"
 )
 
 if(NOT CMAKE_C_COMPILER)
-    message(FATAL_ERROR
-        "The XC8 compiler executable was not found, but what looks"
-        " like an XC8 installation was found at:\n"
-        "    ${MICROCHIP_XC8_PATH}\n"
-        "Please provide the path to a working XC8 installation on the"
-        " command line, for example:\n"
-        "    cmake -DMICROCHIP_XC8_PATH=/opt/microchip/xc8/v2.00 .."
+    find_program(CMAKE_C_COMPILER "xc8"
+        PATHS "${MICROCHIP_XC8_PATH}"
+        PATH_SUFFIXES "bin"
     )
+    if(NOT CMAKE_C_COMPILER)
+        message(FATAL_ERROR
+            "The XC8 compiler executable was not found, but what looks"
+            " like an XC8 installation was found at:\n"
+            "    ${MICROCHIP_XC8_PATH}\n"
+            "Please provide the path to a working XC8 installation on the"
+            " command line, for example:\n"
+            "    cmake -DMICROCHIP_XC8_PATH=/opt/microchip/xc8/v2.00 .."
+        )
+    else()
+        message(WARNING
+            "xc8-cc compiler not found, but found xc8.exe, please"
+            " consider upgrading to xc8 2.0 or higher as it uses"
+            " much more standard clang frontend"
+        )
+        
+        # skip compiler ID since XC8 isn't supported by CMake's test file
+        set(CMAKE_C_COMPILER_ID_RUN 1)
+        set(CMAKE_C_COMPILER_ID "XC8")
+        set(XC8_GET_VERSION_OPTION "--ver")
+    endif()
+else()
+    # skip compiler ID since XC8 isn't supported by CMake's test file
+    set(CMAKE_C_COMPILER_ID_RUN 1)
+    set(CMAKE_C_COMPILER_ID "XC8-CC")
+    set(XC8_GET_VERSION_OPTION "--version")
 endif()
-
-# skip compiler ID since XC8 isn't supported by CMake's test file
-set(CMAKE_C_COMPILER_ID_RUN 1)
-set(CMAKE_C_COMPILER_ID "XC8")
 
 # call the compiler to check its version
 function(_xc8_get_version)
     execute_process(
-        COMMAND "${CMAKE_C_COMPILER}" "--ver"
+        COMMAND "${CMAKE_C_COMPILER}" ${XC8_GET_VERSION_OPTION}
         OUTPUT_VARIABLE output
         ERROR_VARIABLE  output
         RESULT_VARIABLE result
@@ -62,7 +80,7 @@ function(_xc8_get_version)
 
     if(result)
         message(FATAL_ERROR
-            "Calling '${CMAKE_C_COMPILER} --ver' failed."
+            "Calling '${CMAKE_C_COMPILER} ${XC8_GET_VERSION_OPTION}' failed."
         )
     endif()
 
@@ -70,7 +88,7 @@ function(_xc8_get_version)
         set(CMAKE_C_COMPILER_VERSION ${CMAKE_MATCH_1} PARENT_SCOPE)
     else()
         message(FATAL_ERROR
-            "Failed to parse output of '${CMAKE_C_COMPILER} --ver'."
+            "Failed to parse output of '${CMAKE_C_COMPILER} ${XC8_GET_VERSION_OPTION}'."
         )
     endif()
 endfunction()

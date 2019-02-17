@@ -42,3 +42,18 @@ string(APPEND CMAKE_C_LINK_EXECUTABLE
     "   <OBJECTS>   <LINK_LIBRARIES>"
     "   -o<TARGET>"
 )
+
+set(CMAKE_STATIC_LIBRARY_SUFFIX_C ".lpp")
+
+set(CMAKE_C_CREATE_STATIC_LIBRARY)
+string(APPEND CMAKE_C_CREATE_STATIC_LIBRARY
+    "<CMAKE_C_COMPILER> <LINK_FLAGS>"
+    # don't output the copyright notice on every invocation
+    "-Q"
+    # use the configured license mode and fail if it's not available
+    " --mode=${MICROCHIP_XC8_MODE} --nofallback"
+    # build for the configured MCU model
+    " --chip=${MICROCHIP_MCU_MODEL}"
+    "   <OBJECTS>   <LINK_LIBRARIES>"
+    " --output=lpp -o<TARGET>"
+)

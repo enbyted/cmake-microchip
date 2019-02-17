@@ -3,11 +3,12 @@ CMake for the Microchip Toolchain
 #################################
 
 This project provides toolchains and other support modules to enable
-using `CMake`_ with the `Microchip compilers`_, although presently only
-XC16 is supported.
+using `CMake`_ with the `Microchip compilers`_. This fork focuses
+on supporting CLang compiler frontend for XC8 introduced in version 2.0.
 
 .. _CMake: https://cmake.org/
 .. _Microchip compilers: http://www.microchip.com/mplab/compilers
+.. _XC8 2.0 User Guide for PIC: http://ww1.microchip.com/downloads/en/DeviceDoc/MPLAB_XC8_C_Compiler_User_Guide_for_PIC.pdf
 
 Usage
 =====

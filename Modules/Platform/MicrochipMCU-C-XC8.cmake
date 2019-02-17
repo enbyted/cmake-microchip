@@ -67,6 +67,12 @@ else()
     set(CMAKE_C_COMPILER_ID_RUN 1)
     set(CMAKE_C_COMPILER_ID "XC8-CC")
     set(XC8_GET_VERSION_OPTION "--version")
+
+    # Since xc8-cc was found that means that xc8-ar is alongside
+    find_program(CMAKE_AR "xc8-ar"
+        PATHS "${MICROCHIP_XC8_PATH}"
+        PATH_SUFFIXES "bin"
+    )
 endif()
 
 # call the compiler to check its version

@@ -19,6 +19,9 @@ MICROCHIP_PATH_SEARCH(MICROCHIP_XC8_PATH xc8
     CACHE "the path to a Microchip XC8 installation"
 )
 
+option(MICROCHIP_XC8_FORCE_NON_CC "force the use of 'xc8' over 'xc8-cc'" OFF)
+mark_as_advanced(MICROCHIP_XC8_FORCE_NON_CC)
+
 if(NOT MICROCHIP_XC8_PATH)
     message(FATAL_ERROR
         "No Microchip XC8 compiler was found. Please provide the path"
@@ -27,14 +30,15 @@ if(NOT MICROCHIP_XC8_PATH)
     )
 endif()
 
-
 set(CMAKE_FIND_ROOT_PATH "${MICROCHIP_XC8_PATH}")
 
-# skip compiler search and just use XC8
-find_program(CMAKE_C_COMPILER "xc8-cc"
-    PATHS "${MICROCHIP_XC8_PATH}"
-    PATH_SUFFIXES "bin"
-)
+if(NOT MICROCHIP_XC8_FORCE_NON_CC)
+    # skip compiler search and just use XC8
+    find_program(CMAKE_C_COMPILER "xc8-cc"
+        PATHS "${MICROCHIP_XC8_PATH}"
+        PATH_SUFFIXES "bin"
+    )
+endif()
 
 if(NOT CMAKE_C_COMPILER)
     find_program(CMAKE_C_COMPILER "xc8"
@@ -51,16 +55,33 @@ if(NOT CMAKE_C_COMPILER)
             "    cmake -DMICROCHIP_XC8_PATH=/opt/microchip/xc8/v2.00 .."
         )
     else()
-        message(WARNING
-            "xc8-cc compiler not found, but found xc8.exe, please"
-            " consider upgrading to xc8 2.0 or higher as it uses"
-            " much more standard clang frontend"
-        )
-        
+        if(NOT MICROCHIP_XC8_FORCE_NON_CC)
+            message(WARNING
+                "xc8-cc compiler not found, but found xc8.exe, please"
+                " consider upgrading to xc8 2.0 or higher as it uses"
+                " much more standard clang frontend"
+            )
+        endif()
+
         # skip compiler ID since XC8 isn't supported by CMake's test file
         set(CMAKE_C_COMPILER_ID_RUN 1)
         set(CMAKE_C_COMPILER_ID "XC8")
         set(XC8_GET_VERSION_OPTION "--ver")
+
+        if (MICROCHIP_XC8_FORCE_NON_CC)
+            # If we're forcing xc8, assume we can find xc8-ar alongside it
+            find_program(CMAKE_AR "xc8-ar"
+                PATHS "${MICROCHIP_XC8_PATH}"
+                PATH_SUFFIXES "bin"
+            )
+            if(NOT CMAKE_AR)
+                message(FATAL_ERROR
+                    "You requested to use 'xc8' over 'xc8-cc', but 'xc8-ar' "
+                    "was not found. Please check your xc8 installation in "
+                    "${MICROCHIP_XC8_PATH}."
+                )
+            endif()
+        endif()
     endif()
 else()
     # skip compiler ID since XC8 isn't supported by CMake's test file

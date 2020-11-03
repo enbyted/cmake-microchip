@@ -32,6 +32,12 @@ in ``CMakeLists.txt`` as above or on the CMake command line like so::
 
     cmake -DMICROCHIP_MCU=PIC24FJ256GB004 .
 
+If you wish to use the 'legacy' xc8 compiler (`xc8`) over the `clang`-based
+version (`xc8-cc`), this can be achieved by telling CMake to 'force' the use of
+non-`cc` version::
+
+    cmake -DMICROCHIP_XC8_FORCE_NON_CC:BOOL=ON .
+
 Copying
 =======
 

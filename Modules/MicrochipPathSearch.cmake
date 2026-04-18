@@ -44,6 +44,9 @@ function(MICROCHIP_PATH_SEARCH outvar target)
 
     if(CMAKE_HOST_SYSTEM MATCHES "Linux")
         list(APPEND MICROCHIP_SEARCH_PATH /opt/microchip)
+    elseif(CMAKE_HOST_SYSTEM MATCHES "Darwin")
+        # macOS XC8 installer default (Microchip-provided .pkg).
+        list(APPEND MICROCHIP_SEARCH_PATH /Applications/microchip)
     elseif(CMAKE_HOST_SYSTEM MATCHES "Windows")
         list(APPEND MICROCHIP_SEARCH_PATH
             "C:/Program Files/Microchip"

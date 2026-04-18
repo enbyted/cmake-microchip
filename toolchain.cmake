@@ -20,8 +20,10 @@
 # to provide information about the target platform
 
 
-# CMP0057 (IN_LIST operator) since 3.3
-cmake_minimum_required(VERSION 3.3)
+# CMP0057 (IN_LIST operator) since 3.3. Bumped from 3.3 to 3.5 so
+# CMake >= 4.0 (which hard-rejects minima < 3.5) can load this
+# toolchain. Functionality unchanged — 3.5 is a superset of 3.3.
+cmake_minimum_required(VERSION 3.5)
 
 
 # record the directory containing this script
